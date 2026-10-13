@@ -169,16 +169,16 @@ interface Built {
 
 const PURPOSE: Record<SessionType, string> = {
   easy: "Courir lentement construit ton moteur aérobie sans fatigue. Tu dois pouvoir parler en phrases complètes.",
-  long: "La sortie longue habitue ton corps à durer : tendons, réserves d'énergie, mental. Reste en aisance du début à la fin.",
+  long: "La sortie longue habitue ton corps à durer : tendons, réserves d’énergie, mental. Reste en aisance du début à la fin.",
   vma: "Des efforts courts près de ta vitesse maximale pour élever ton plafond. Les récupérations comptent autant que les efforts.",
-  threshold: "Le seuil, c'est l'allure « confortablement difficile ». Le travailler repousse le moment où tu t'essouffles.",
-  race_pace: "Répéter l'allure de ta course pour qu'elle devienne familière le jour J.",
-  hills: "Les côtes renforcent les jambes et la foulée, avec moins de chocs qu'à plat.",
+  threshold: "Le seuil, c’est l’allure « confortablement difficile ». Le travailler repousse le moment où tu t’essouffles.",
+  race_pace: "Répéter l’allure de ta course pour qu’elle devienne familière le jour J.",
+  hills: "Les côtes renforcent les jambes et la foulée, avec moins de chocs qu’à plat.",
   trail: "Varier les terrains et le dénivelé pour préparer ton corps aux sentiers.",
   strength: "Renforcement général : gainage, mollets, fessiers. Moins de blessures, meilleure foulée.",
   test: "Un effort maximal pour mettre à jour tes allures. Échauffe-toi bien et donne tout.",
   race: "Jour de course. Pars prudemment, garde ton allure, finis fort.",
-  rest: "Repos. C'est pendant la récupération que tu progresses.",
+  rest: "Repos. C’est pendant la récupération que tu progresses.",
 };
 
 function durationOf(steps: Step[]): number {

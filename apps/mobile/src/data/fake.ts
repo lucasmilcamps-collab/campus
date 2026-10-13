@@ -104,7 +104,7 @@ export function createFakeApi(opts: FakeOptions = {}): Api & { reset(): Promise<
     return s.user;
   }
   function requirePlan(s: State): Plan {
-    if (!s.plan) throw new ApiError('not_found', "Tu n'as pas encore de plan.");
+    if (!s.plan) throw new ApiError('not_found', "Tu n’as pas encore de plan.");
     return s.plan;
   }
   function record(s: State, a: Adjustment | null, reason?: AdjustmentRow['reason']): AdjustmentRow | null {
@@ -173,7 +173,7 @@ export function createFakeApi(opts: FakeOptions = {}): Api & { reset(): Promise<
         'onboarding',
         (s) => {
           const u = requireUser(s);
-          if (input.age < 14 || input.age > 99) throw new ApiError('invalid', "L'âge doit être compris entre 14 et 99 ans.");
+          if (input.age < 14 || input.age > 99) throw new ApiError('invalid', "L’âge doit être compris entre 14 et 99 ans.");
           const lvl = estimateLevel({ ...input, sex: input.sex });
           s.profile = input;
           s.level = { vmaKmh: lvl.vmaKmh, zones: lvl.zones, source: lvl.source, measuredOn: today() };
@@ -376,7 +376,8 @@ export function createFakeApi(opts: FakeOptions = {}): Api & { reset(): Promise<
             const p = s.plan;
             const t = today();
             const regenerated = generatePlan({
-              id: p.id,
+              // revision-scoped ids: past sessions keep theirs, new ones never collide
+              id: `${p.id}.r${p.revision + 1}`,
               goal: p.goal,
               startDate: addDays(t, 1),
               sessionsPerWeek: patch.sessionsPerWeek,

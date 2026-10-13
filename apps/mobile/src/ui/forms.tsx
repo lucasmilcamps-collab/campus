@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Pressable, TextInput, View, type KeyboardTypeOptions, type PressableStateCallbackType } from 'react-native';
 import { Check, Minus, Plus, type LucideIcon } from 'lucide-react-native';
-import { useTheme } from '../theme';
+import { keyActivate, useTheme } from '../theme';
 import { T } from './core';
 
 type PState = PressableStateCallbackType & { focused?: boolean };
@@ -65,8 +65,10 @@ export function ChoiceCard<V extends string>({
   return (
     <Pressable
       onPress={choice.disabled ? undefined : onPress}
+      {...keyActivate(choice.disabled ? undefined : onPress)}
       accessibilityRole={multi ? 'checkbox' : 'radio'}
-      accessibilityState={{ checked: selected, disabled: !!choice.disabled }}
+      aria-checked={selected}
+      aria-disabled={!!choice.disabled}
       accessibilityLabel={[choice.title, choice.description, choice.badge].filter(Boolean).join(', ')}
       style={(s: PState) => [
         {
@@ -132,8 +134,9 @@ export function Segmented<V extends string | number>({
           <Pressable
             key={String(o.value)}
             onPress={() => onChange(o.value)}
+            {...keyActivate(() => onChange(o.value))}
             accessibilityRole="radio"
-            accessibilityState={{ checked: on }}
+            aria-checked={on}
             accessibilityLabel={[o.label, o.caption].filter(Boolean).join(', ')}
             style={(s: PState) => [
               {
@@ -267,7 +270,7 @@ export function NumberStepper({
         onPress={() => !disabled && onChange(Math.min(max, Math.max(min, value + delta)))}
         accessibilityRole="button"
         accessibilityLabel={a11y}
-        accessibilityState={{ disabled }}
+        aria-disabled={disabled}
         style={(s: PState) => [
           {
             width: t.layout.touch_min,

@@ -71,6 +71,7 @@ export function Button({
   disabled,
   loading,
   block,
+  center,
   icon: Icon,
   accessibilityLabel,
   testID,
@@ -82,6 +83,8 @@ export function Button({
   disabled?: boolean;
   loading?: boolean;
   block?: boolean;
+  /** centre in a column (empty states) instead of hugging the start edge */
+  center?: boolean;
   icon?: LucideIcon;
   accessibilityLabel?: string;
   testID?: string;
@@ -102,7 +105,8 @@ export function Button({
       onPress={inactive ? undefined : onPress}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityState={{ disabled: !!disabled, busy: !!loading }}
+      aria-disabled={!!disabled}
+      aria-busy={!!loading}
       disabled={inactive}
       hitSlop={size === 'sm' ? 4 : 0}
       style={(s: PState) => [
@@ -118,7 +122,7 @@ export function Button({
           justifyContent: 'center',
           gap: t.sp(2),
           opacity: disabled ? 0.4 : 1,
-          alignSelf: block ? 'stretch' : 'flex-start',
+          alignSelf: block ? 'stretch' : center ? 'center' : 'flex-start',
           transform: [{ scale: s.pressed ? 0.97 : 1 }],
         },
         t.focusRing(!!s.focused),
@@ -328,7 +332,7 @@ export function EmptyState({
           {body}
         </T>
       ) : null}
-      {cta ? <Button label={cta.label} onPress={cta.onPress} /> : null}
+      {cta ? <Button label={cta.label} onPress={cta.onPress} center /> : null}
     </View>
   );
 }
@@ -337,7 +341,7 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
   return (
     <EmptyState
       icon={AlertCircle}
-      title="Ça n'a pas marché"
+      title="Ça n’a pas marché"
       body={message}
       cta={onRetry ? { label: 'Réessayer', onPress: onRetry } : undefined}
     />

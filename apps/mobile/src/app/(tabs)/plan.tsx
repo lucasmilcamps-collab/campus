@@ -96,7 +96,7 @@ function WeekRow({
       <Pressable
         onPress={onToggle}
         accessibilityRole="button"
-        accessibilityState={{ expanded: open }}
+        aria-expanded={open}
         accessibilityLabel={`Semaine ${week.index + 1}, ${PHASE_LABEL[week.phase]}, ${week.targetVolumeKm} kilomètres${current ? ', semaine en cours' : ''}`}
         style={(s: PressableStateCallbackType & { focused?: boolean }) => [
           {

@@ -72,3 +72,17 @@ export function effortOfZone(zone: string): Effort {
 
 /** Tabular figures for anything that updates or lines up. */
 export const tabular: TextStyle = { fontVariant: ['tabular-nums'] };
+
+/** react-native-web only activates role="button" with the keyboard. Radios,
+ *  tabs and other pressables get Enter/Space here (web only; no-op on native). */
+export function keyActivate(onPress?: () => void): object {
+  if (Platform.OS !== 'web' || !onPress) return {};
+  return {
+    onKeyDown: (e: { key: string; preventDefault: () => void }) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onPress();
+      }
+    },
+  };
+}

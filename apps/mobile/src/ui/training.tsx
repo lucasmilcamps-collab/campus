@@ -2,7 +2,7 @@ import { Pressable, View, type PressableStateCallbackType } from 'react-native';
 import type { ReactNode } from 'react';
 import { Check, Lock } from 'lucide-react-native';
 import type { Session, SessionType, Step, PaceZones } from '@stride/engine';
-import { effortOf, effortOfZone, useTheme, type Effort } from '../theme';
+import { effortOf, effortOfZone, keyActivate, useTheme, type Effort } from '../theme';
 import { dayLong, dayNum, dayShort, duration, km, pace, paceSpoken, RPE_LABEL, SESSION_LABEL, STEP_LABEL, ZONE_LABEL } from '../copy';
 import { T } from './core';
 
@@ -70,9 +70,10 @@ export function WeekStrip({
           <Pressable
             key={d}
             onPress={() => onSelect(d)}
+            {...keyActivate(() => onSelect(d))}
             accessibilityRole="tab"
-            accessibilityState={{ selected: on }}
-            accessibilityLabel={`${dayLong(d)}${d === today ? ", aujourd'hui" : ''}, ${s ? `${SESSION_LABEL[s.type]}, ${status}` : 'repos'}`}
+            aria-selected={on}
+            accessibilityLabel={`${dayLong(d)}${d === today ? ", aujourd’hui" : ''}, ${s ? `${SESSION_LABEL[s.type]}, ${status}` : 'repos'}`}
             style={(st: PState) => [
               {
                 width: t.layout.touch_min,
@@ -131,7 +132,7 @@ export function SessionCard({
 }) {
   const t = useTheme();
   const e = t.effort(effortOf(session.type));
-  const statusText = today && session.status === 'planned' ? "Aujourd'hui" : STATUS_TEXT[session.status];
+  const statusText = today && session.status === 'planned' ? "Aujourd’hui" : STATUS_TEXT[session.status];
   const muted = session.status === 'missed' || session.status === 'skipped';
   return (
     <Pressable
@@ -275,7 +276,7 @@ export function RPEScale({ value, onChange, error }: { value: number | null; onC
   const t = useTheme();
   return (
     <View style={{ gap: t.sp(2) }}>
-      <View accessibilityRole="radiogroup" accessibilityLabel="Comment t'es-tu senti ?" style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+      <View accessibilityRole="radiogroup" accessibilityLabel="Comment t’es-tu senti ?" style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         {([1, 2, 3, 4, 5] as const).map((n) => {
           const e = t.effort(n);
           const on = value === n;
@@ -283,8 +284,9 @@ export function RPEScale({ value, onChange, error }: { value: number | null; onC
             <Pressable
               key={n}
               onPress={() => onChange(n)}
+              {...keyActivate(() => onChange(n))}
               accessibilityRole="radio"
-              accessibilityState={{ checked: on }}
+              aria-checked={on}
               accessibilityLabel={`${n}, ${RPE_LABEL[n]}`}
               style={(s: PState) => [{ alignItems: 'center', gap: t.sp(1), width: 64, borderRadius: t.r.md }, t.focusRing(!!s.focused)]}
             >
