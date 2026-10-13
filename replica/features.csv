@@ -1,0 +1,55 @@
+feature,area,priority,original,clone,notes
+Sign up with email Apple or Google,onboarding,must,yes,no,S01
+Onboarding questionnaire (about 10 questions: age experience weekly volume goal),onboarding,must,yes,no,S02
+Estimate level and pace zones without a test,onboarding,must,yes,no,S04; from age experience volume (changelog Jul 2026)
+Pace zone table (EF marathon half 10K threshold VMA),plan,must,yes,no,S04 S10; derive from public training science not theirs
+Goal picker (5K 10K half marathon trail ultra speed start running injury return),goals,must,yes,no,S05
+Race date and target time on the goal,goals,must,yes,no,S05
+Choose sessions per week 3 to 5 with impact preview,plan,must,yes,no,S06; changelog Jan 2026
+Generate a periodised plan 6 weeks to 12 months,plan,must,yes,no,S06 S09; the core engine
+Home week view with today's session and race countdown,plan,must,yes,no,S08
+Plan overview by week,plan,must,yes,no,S09
+Structured session detail (warm-up blocks repeats cool-down target paces),sessions,must,yes,no,S10
+Purpose text explaining each session,sessions,must,yes,no,S10; your own copy
+Mark a session done or missed,sessions,must,yes,no,S08 S10
+Post-session feedback with RPE (up to extreme) and a note,feedback,must,yes,no,S13
+Adapt paces and plan from feedback and missed sessions,plan,must,yes,no,F05; bounded adjustment per update
+Move a session to another day,plan,must,yes,no,S16
+Connect Strava and import activities,integrations,must,yes,no,S25; open API; check the API terms
+Match imported activity to the planned session,integrations,must,yes,no,S14
+Paywall with free tier and monthly/yearly subscription and free trial,payments,must,yes,no,S07; IAP on iOS and Android
+Free programmes (evaluation week beginner injury return),payments,must,yes,no,FAQ offers 2026
+Session summary planned vs actual,sessions,should,yes,no,S14; v5.6
+Export structured workout to Garmin with pace tolerance,integrations,should,yes,no,S11; needs Garmin partner approval; current week only
+Export to Coros Suunto Apple Watch,integrations,should,yes,no,S11; partner APIs per brand
+Phone GPS tracker with live step guidance,tracker,should,yes,no,S12
+Audio cues during the run,tracker,should,yes,no,S12
+Trail sessions with elevation (D+) targets,sessions,should,yes,no,S10 S12
+Secondary races inside one plan,goals,should,yes,no,S06
+1500 m test or new reference time to re-evaluate,plan,should,yes,no,S26
+Add a manual activity,activities,should,yes,no,S15; v5.7
+Training journal of notes,activities,should,yes,no,S17; v5.10
+Stats: weekly volume and pace trend,stats,should,yes,no,S18
+Race calendar search with filters (date place distance D+),races,should,yes,no,S19
+Set a race from the calendar as the goal,races,should,yes,no,S20
+Session reminders (push),notifications,should,yes,no,S27
+Trial ending email 4 days before,notifications,should,yes,no,FAQ subscription
+Difficulty level slider on the goal,goals,should,yes,no,S05 goals page
+Learn articles per session type,content,could,yes,no,S21; write your own
+Race nutrition guidance in long and hard sessions (Gut Training),sessions,could,yes,no,setting toggle; v4.7
+Strength sessions in the plan,sessions,could,yes,no,marketing claim; unconfirmed in-app
+Share visual of a completed session,social,could,yes,no,v5.7
+Crews: groups with a shared calendar,community,could,yes,no,S22; v6.1
+Crew challenges by distance time or elevation,community,could,yes,no,S22 S23
+Challenges and badges,community,could,yes,no,S23
+Show members registered for the same race,races,could,yes,no,S20
+Strava history to refine the level estimate,onboarding,could,yes,no,S03; check Strava terms on data use
+Apple Watch live elevation,tracker,could,yes,no,watch app 4.8.3
+Web version of the race directory (SEO),races,could,yes,no,campus.coach/courses
+Forum with themed rooms,community,could,yes,no,separate app; a link to Discord/Discourse is enough at first
+Human coaches (Pro tier),coaching,could,yes,skip,a service not software; €499/yr offer
+Their training method and session library,plan,could,yes,skip,proprietary know-how; build your own from public training science
+Race directory data,races,could,yes,skip,their curated database; source your own
+Community members and their content,community,could,yes,skip,the network is not cloneable
+Partner bibs and race-organiser deals,partners,could,yes,skip,business deals
+Campus brand name logo copy and illustrations,brand,could,yes,skip,run /replica-brand
