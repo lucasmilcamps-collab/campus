@@ -24,8 +24,10 @@ export default function PlanSetup() {
     );
   }
 
+  // run/walk programmes are always three sessions a week
+  const progression = goal.kind === 'start_running' || goal.kind === 'injury_return';
   const submit = async () => {
-    const r = await create.run(goal, spw);
+    const r = await create.run(goal, progression ? 3 : spw);
     if (r) router.replace('/home');
   };
   const paywalled = create.error && 'code' in create.error && create.error.code === 'paywall';
@@ -52,7 +54,7 @@ export default function PlanSetup() {
       }
     >
       <Stack gap={2}>
-        <H1>Combien de séances par semaine ?</H1>
+        <H1>{progression ? 'Ton programme' : 'Combien de séances par semaine ?'}</H1>
         <T color="text-muted">
           Objectif : {goal.name ?? km(goal.distanceM)} le {dateLong(goal.date)}.
         </T>
@@ -61,7 +63,20 @@ export default function PlanSetup() {
       {preview.error ? <ErrorState message={preview.error.message} onRetry={preview.reload} /> : null}
       {preview.loading ? <LoadingCards n={2} /> : null}
 
-      {preview.data ? (
+      {preview.data && progression ? (
+        <Card>
+          <SectionTitle>Ton programme</SectionTitle>
+          <T v="xl" num>
+            {preview.data.weeks} semaines · 3 séances par semaine
+          </T>
+          <T v="sm" color="text-muted">
+            {goal.kind === 'start_running'
+              ? 'Des blocs de course et de marche qui s’allongent chaque semaine, jusqu’à 30 minutes de course continue.'
+              : 'Une reprise par blocs courts, jusqu’à 40 minutes de course continue. Arrête-toi si la douleur revient.'}
+          </T>
+        </Card>
+      ) : null}
+      {preview.data && !progression ? (
         <>
           <Segmented<3 | 4 | 5>
             label="Séances par semaine"

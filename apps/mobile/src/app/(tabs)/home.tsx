@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { ChevronLeft, ChevronRight, Flag, NotebookPen, Plus } from 'lucide-react-native';
 import { addDays, daysBetween, mondayOf } from '@stride/engine';
 import { today, useMutation, useQuery } from '../../data';
-import { dayLong, PHASE_LABEL } from '../../copy';
+import { dayLong, GOAL_LABEL, PHASE_LABEL } from '../../copy';
 import {
   Banner,
   Button,
@@ -106,7 +106,7 @@ export default function Home() {
         <Stack row gap={2}>
           <Flag size={16} color={t.c['text-muted']} strokeWidth={1.75} />
           <T v="sm" weight="600" numberOfLines={1} style={{ flex: 1 }}>
-            {p.goal.name ?? 'Ton objectif'}
+            {p.goal.name ?? GOAL_LABEL[p.goal.kind]}
           </T>
           <T v="sm" color="text-muted" num>
             {toGo > 0 ? `J-${toGo}` : toGo === 0 ? 'C’est aujourd’hui !' : 'Terminé'}

@@ -149,6 +149,44 @@ describe('plan', () => {
   });
 });
 
+describe('progression plans (start running, injury return)', () => {
+  const start = (kind: 'start_running' | 'injury_return', weeks: number) =>
+    generatePlan({
+      id: 'b',
+      goal: { kind, distanceM: 5000, date: addDays('2026-10-12', weeks * 7 - 1) },
+      startDate: '2026-10-12',
+      sessionsPerWeek: 4,
+      vmaKmh: 9,
+      currentWeeklyKm: 0,
+    });
+
+  it('three easy sessions a week, never two days in a row, nothing hard', () => {
+    const p = start('start_running', 8);
+    expect(p.sessionsPerWeek).toBe(3);
+    expect(p.sessions).toHaveLength(24);
+    expect(p.sessions.every((s) => s.type === 'easy')).toBe(true);
+    for (let i = 1; i < p.sessions.length; i++) expect(addDays(p.sessions[i - 1].date, 1)).not.toBe(p.sessions[i].date);
+  });
+
+  it('run blocks lengthen week after week and the plan ends with 30 min continuous', () => {
+    const p = start('start_running', 8);
+    const runMin = (w: number) => p.sessions.find((s) => s.weekIndex === w)!.steps[1].children![0].durationS!;
+    expect(runMin(0)).toBe(60);
+    for (let w = 1; w < 7; w++) expect(runMin(w)).toBeGreaterThanOrEqual(runMin(w - 1));
+    expect(p.sessions.at(-1)!.title).toBe('30 min de course continue');
+  });
+
+  it('injury return starts with longer blocks and ends at 40 min', () => {
+    const p = start('injury_return', 6);
+    expect(p.sessions[0].steps[1].children![0].durationS!).toBe(240);
+    expect(p.sessions.at(-1)!.title).toBe('40 min de course continue');
+  });
+
+  it('titles use French decimals', () => {
+    expect(start('start_running', 8).sessions.some((s) => /1,5 min de marche/.test(s.title))).toBe(true);
+  });
+});
+
 describe('preview', () => {
   it('shows more volume and a faster time with more sessions', () => {
     const pv = previewPlan(HALF, START, 15, 20);

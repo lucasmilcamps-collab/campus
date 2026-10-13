@@ -24,7 +24,7 @@ const ctx = async (width = 390, height = 844) => {
   });
   return p;
 };
-const visible = (p, text) => p.getByText(text).filter({ visible: true }).first();
+const visible = (p, text, o) => p.getByText(text, o).filter({ visible: true }).first();
 const btn = (p, name) => p.getByRole('button', { name, exact: true }).filter({ visible: true }).last();
 const shot = async (p, id) => SHOTS && (await p.waitForTimeout(400), await p.screenshot({ path: `${SHOTS}/${id}.png` }));
 
@@ -144,6 +144,34 @@ await run('settings', async (p) => {
   const n = await p.getByRole('button', { name: /^(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche) \d+ octobre, / }).filter({ visible: true }).count();
   if (n !== 5) throw new Error(`expected 5 sessions next week after switching, got ${n}`);
   step('settings: switching to 5 sessions/week regenerates the future plan');
+});
+
+// ---------------------------------------------------------------- free beginner path, no paywall
+await run('beginner', async (p) => {
+  await p.goto(`${BASE}/?seed=new&today=2026-10-12`);
+  await p.getByLabel('Adresse e-mail').fill('debut@example.com');
+  await btn(p, 'Continuer avec mon e-mail').click();
+  await visible(p, 'Étape 1 sur 7').waitFor();
+  await btn(p, 'Suivant').click();
+  await btn(p, 'Suivant').click();
+  await p.getByRole('radio', { name: 'Je préfère ne pas répondre' }).click();
+  await btn(p, 'Suivant').click();
+  await p.getByRole('radio', { name: /Je commence/ }).click();
+  for (let i = 0; i < 3; i++) await btn(p, 'Suivant').click();
+  await p.getByRole('radio', { name: 'Non, estimez pour moi' }).click();
+  await btn(p, 'Voir mon niveau').click();
+  await visible(p, 'Estimées à partir de tes réponses.', { exact: false }).waitFor();
+  await btn(p, 'Choisir mon objectif').click();
+  await p.getByRole('radio', { name: /Commencer à courir/ }).click();
+  await visible(p, 'Cet objectif est inclus gratuitement.').waitFor();
+  await btn(p, 'Continuer').click();
+  await visible(p, '8 semaines · 3 séances par semaine').waitFor();
+  await shot(p, 'S06-beginner');
+  await btn(p, 'Créer mon plan').click();
+  await visible(p, 'Semaine 1 sur 8').waitFor();
+  await visible(p, /min de course, 2 min de marche/).waitFor();
+  await shot(p, 'S08-beginner');
+  step('free beginner programme: no paywall, run/walk sessions, 8 weeks');
 });
 
 // ---------------------------------------------------------------- desktop width

@@ -1,37 +1,37 @@
 feature,area,priority,original,clone,notes
-Sign up with email Apple or Google,onboarding,must,yes,no,S01
-Onboarding questionnaire (about 10 questions: age experience weekly volume goal),onboarding,must,yes,no,S02
-Estimate level and pace zones without a test,onboarding,must,yes,no,S04; from age experience volume (changelog Jul 2026)
-Pace zone table (EF marathon half 10K threshold VMA),plan,must,yes,no,S04 S10; derive from public training science not theirs
-Goal picker (5K 10K half marathon trail ultra speed start running injury return),goals,must,yes,no,S05
-Race date and target time on the goal,goals,must,yes,no,S05
-Choose sessions per week 3 to 5 with impact preview,plan,must,yes,no,S06; changelog Jan 2026
-Generate a periodised plan 6 weeks to 12 months,plan,must,yes,no,S06 S09; the core engine
-Home week view with today's session and race countdown,plan,must,yes,no,S08
-Plan overview by week,plan,must,yes,no,S09
-Structured session detail (warm-up blocks repeats cool-down target paces),sessions,must,yes,no,S10
-Purpose text explaining each session,sessions,must,yes,no,S10; your own copy
-Mark a session done or missed,sessions,must,yes,no,S08 S10
-Post-session feedback with RPE (up to extreme) and a note,feedback,must,yes,no,S13
-Adapt paces and plan from feedback and missed sessions,plan,must,yes,no,F05; bounded adjustment per update
-Move a session to another day,plan,must,yes,no,S16
-Connect Strava and import activities,integrations,must,yes,no,S25; open API; check the API terms
-Match imported activity to the planned session,integrations,must,yes,no,S14
-Paywall with free tier and monthly/yearly subscription and free trial,payments,must,yes,no,S07; IAP on iOS and Android
-Free programmes (evaluation week beginner injury return),payments,must,yes,no,FAQ offers 2026
+Sign up with email Apple or Google,onboarding,must,yes,partial,S01 | clone: S01 email only on the fake layer; no OTP code yet; Apple and Google need Supabase Auth (/replica-backend)
+Onboarding questionnaire (about 10 questions: age experience weekly volume goal),onboarding,must,yes,yes,S02 | clone: S02: 7 steps (name age sex experience runs/week km/week recent time); goal is S05
+Estimate level and pace zones without a test,onboarding,must,yes,yes,S04; from age experience volume (changelog Jul 2026) | clone: S04; engine estimateLevel; race time optional
+Pace zone table (EF marathon half 10K threshold VMA),plan,must,yes,yes,S04 S10; derive from public training science not theirs | clone: S04 S10; race paces from predicted race times; 30 engine tests
+Goal picker (5K 10K half marathon trail ultra speed start running injury return),goals,must,yes,partial,"S05 | clone: S05: road 5k-marathon, trail (km + D+), speed, start running, injury return; ultra and trail use road templates; no evaluation week"
+Race date and target time on the goal,goals,must,yes,yes,S05 | clone: S05 S06; target compared with predicted time
+Choose sessions per week 3 to 5 with impact preview,plan,must,yes,yes,S06; changelog Jan 2026 | clone: S06 preview; S24 change regenerates future weeks
+Generate a periodised plan 6 weeks to 12 months,plan,must,yes,yes,S06 S09; the core engine | clone: engine: base/build/specific/taper/race; recovery every 4th week; +10%/week cap; run/walk progressions for beginners
+Home week view with today's session and race countdown,plan,must,yes,yes,"S08 | clone: S08: week strip, hero session, J-n, adjustment banner"
+Plan overview by week,plan,must,yes,yes,"S09 | clone: S09: phases, volume bars, sessions per week"
+Structured session detail (warm-up blocks repeats cool-down target paces),sessions,must,yes,yes,S10 | clone: S10
+Purpose text explaining each session,sessions,must,yes,yes,S10; your own copy | clone: S10; our own copy in the engine
+Mark a session done or missed,sessions,must,yes,yes,S08 S10 | clone: S13 marks done; missed swept on read (job in /replica-backend)
+Post-session feedback with RPE (up to extreme) and a note,feedback,must,yes,yes,S13 | clone: S13 with pain flag
+Adapt paces and plan from feedback and missed sessions,plan,must,yes,yes,F05; bounded adjustment per update | clone: engine adapt(); capped 5%/2%; pain swaps next hard session; summary shown on S08 and S13
+Move a session to another day,plan,must,yes,yes,S16 | clone: S16 with back-to-back and double-booking warnings
+Connect Strava and import activities,integrations,must,yes,partial,"S25; open API; check the API terms | clone: S25 connect is simulated; OAuth, webhook and import in /replica-backend"
+Match imported activity to the planned session,integrations,must,yes,partial,S14 | clone: same-day matching works for manual activities; no provider imports yet
+Paywall with free tier and monthly/yearly subscription and free trial,payments,must,yes,partial,"S07; IAP on iOS and Android | clone: S07 UI, trial state, paid-goal gate; purchase simulated until RevenueCat (/replica-backend); prices are placeholders"
+Free programmes (evaluation week beginner injury return),payments,must,yes,partial,FAQ offers 2026 | clone: start running (8 wk) and injury return (6 wk) run/walk programmes are free; evaluation week not built
 Session summary planned vs actual,sessions,should,yes,no,S14; v5.6
 Export structured workout to Garmin with pace tolerance,integrations,should,yes,no,S11; needs Garmin partner approval; current week only
 Export to Coros Suunto Apple Watch,integrations,should,yes,no,S11; partner APIs per brand
 Phone GPS tracker with live step guidance,tracker,should,yes,no,S12
 Audio cues during the run,tracker,should,yes,no,S12
-Trail sessions with elevation (D+) targets,sessions,should,yes,no,S10 S12
+Trail sessions with elevation (D+) targets,sessions,should,yes,partial,S10 S12 | clone: trail goals accepted (km + D+) but sessions have no D+ targets yet
 Secondary races inside one plan,goals,should,yes,no,S06
 1500 m test or new reference time to re-evaluate,plan,should,yes,no,S26
-Add a manual activity,activities,should,yes,no,S15; v5.7
-Training journal of notes,activities,should,yes,no,S17; v5.10
+Add a manual activity,activities,should,yes,yes,S15; v5.7 | clone: S15; auto-matched to the planned session that day
+Training journal of notes,activities,should,yes,yes,S17; v5.10 | clone: S17
 Stats: weekly volume and pace trend,stats,should,yes,no,S18
-Race calendar search with filters (date place distance D+),races,should,yes,no,S19
-Set a race from the calendar as the goal,races,should,yes,no,S20
+Race calendar search with filters (date place distance D+),races,should,yes,partial,"S19 | clone: S19 text (name or city), distance band and trail filters on demo races; no date range or D+ filter; no real race data source"
+Set a race from the calendar as the goal,races,should,yes,yes,S20 | clone: S20 -> S05 prefilled
 Session reminders (push),notifications,should,yes,no,S27
 Trial ending email 4 days before,notifications,should,yes,no,FAQ subscription
 Difficulty level slider on the goal,goals,should,yes,no,S05 goals page
@@ -42,7 +42,7 @@ Share visual of a completed session,social,could,yes,no,v5.7
 Crews: groups with a shared calendar,community,could,yes,no,S22; v6.1
 Crew challenges by distance time or elevation,community,could,yes,no,S22 S23
 Challenges and badges,community,could,yes,no,S23
-Show members registered for the same race,races,could,yes,no,S20
+Show members registered for the same race,races,could,yes,partial,S20 | clone: S19 S20 show a count from demo data; real counts need the backend
 Strava history to refine the level estimate,onboarding,could,yes,no,S03; check Strava terms on data use
 Apple Watch live elevation,tracker,could,yes,no,watch app 4.8.3
 Web version of the race directory (SEO),races,could,yes,no,campus.coach/courses

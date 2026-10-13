@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { ChevronDown, ChevronUp, Flag } from 'lucide-react-native';
 import { mondayOf, type Session, type Week } from '@stride/engine';
 import { today, useQuery } from '../../data';
-import { dateLong, PHASE_LABEL } from '../../copy';
+import { dateLong, GOAL_LABEL, PHASE_LABEL } from '../../copy';
 import { EmptyState, ErrorState, H1, LoadingCards, Screen, SessionCard, Stack, T } from '../../ui';
 import { useTheme } from '../../theme';
 
@@ -45,7 +45,7 @@ export default function PlanOverview() {
   return (
     <Screen testID="S09">
       <Stack gap={1}>
-        <H1>{p.goal.name ?? 'Ton plan'}</H1>
+        <H1>{p.goal.name ?? GOAL_LABEL[p.goal.kind]}</H1>
         <T color="text-muted" num>
           {p.weeks.length} semaines · jusqu’au {dateLong(p.endDate)} · {p.sessionsPerWeek} séances par semaine
         </T>

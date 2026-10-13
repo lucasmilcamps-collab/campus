@@ -286,8 +286,41 @@ export function planLengthWeeks(startDate: ISODate, goalDate: ISODate): number {
   return Math.floor(daysBetween(mondayOf(startDate), goalDate) / 7) + 1;
 }
 
+/** Run/walk progressions for "start running" and "back from injury": three
+ *  sessions a week, run blocks lengthen and walk breaks shrink until the last
+ *  week is continuous running (30 min for beginners, 40 for a return). */
+function progressionSession(kind: 'start_running' | 'injury_return', week: number, nWeeks: number, slot: number, zones: PaceZones): Built {
+  const r = nWeeks <= 1 ? 1 : week / (nWeeks - 1); // 0 -> 1 across the plan
+  const goalMin = kind === 'start_running' ? 30 : 40;
+  const lastWeek = week === nWeeks - 1;
+  const walk = (s: number): Step => ({ kind: 'recovery', durationS: s, zone: 'walk' });
+  const warm: Step = { kind: 'warmup', durationS: 5 * 60, zone: 'walk' };
+  if (lastWeek && slot === 2) {
+    return {
+      type: 'easy',
+      title: `${goalMin} min de course continue`,
+      purpose: 'Le cap du programme : courir sans t’arrêter. Pars très doucement, tu dois pouvoir parler.',
+      steps: [warm, step('work', goalMin * 60, 'ef', zones), { kind: 'cooldown', durationS: 5 * 60, zone: 'walk' }],
+    };
+  }
+  const start = kind === 'start_running' ? 1 : 4; // minutes of running per block
+  const runMin = Math.round(start + r * (goalMin / 3 - start)) + (slot === 2 ? 1 : 0);
+  const walkS = Math.max(60, Math.round(120 - r * 60));
+  const reps = Math.max(2, Math.round((goalMin * (0.6 + 0.4 * r)) / (runMin + walkS / 60)));
+  return {
+    type: 'easy',
+    title: `${reps} × ${runMin} min de course, ${(Math.round(walkS / 30) / 2).toLocaleString('fr-FR')} min de marche`,
+    purpose:
+      kind === 'start_running'
+        ? 'Alterner course et marche permet de courir plus longtemps sans te mettre dans le rouge. Les blocs de course s’allongent chaque semaine.'
+        : 'On reprend par blocs courts pour laisser tes tissus se réhabituer. Arrête-toi si la douleur revient.',
+    steps: [warm, { kind: 'repeat', repeat: reps, children: [step('work', runMin * 60, 'ef', zones), walk(walkS)] }, { kind: 'cooldown', durationS: 5 * 60, zone: 'walk' }],
+  };
+}
+
 export function generatePlan(input: PlanInput): Plan {
   const { goal, startDate, sessionsPerWeek: spw, vmaKmh } = input;
+  if (goal.kind === 'start_running' || goal.kind === 'injury_return') return progressionPlan(input);
   if (daysBetween(startDate, goal.date) < 0) throw new PlanError('past_date', 'La date est déjà passée.');
   const nWeeks = planLengthWeeks(startDate, goal.date);
   if (nWeeks < MIN_WEEKS) throw new PlanError('too_short', `Il faut au moins ${MIN_WEEKS} semaines de préparation.`);
@@ -350,6 +383,41 @@ export function generatePlan(input: PlanInput): Plan {
     startDate,
     endDate: goal.date,
     sessionsPerWeek: spw,
+    vmaKmh,
+    zones,
+    revision: 1,
+    engineVersion: ENGINE_VERSION,
+    weeks,
+    sessions,
+  };
+}
+
+function progressionPlan(input: PlanInput): Plan {
+  const { goal, startDate, vmaKmh } = input;
+  const kind = goal.kind as 'start_running' | 'injury_return';
+  const zones = zonesFromVma(vmaKmh);
+  const nWeeks = planLengthWeeks(startDate, goal.date);
+  if (nWeeks < 1) throw new PlanError('past_date', 'La date est déjà passée.');
+  const firstMonday = mondayOf(startDate);
+  const weeks: Week[] = [];
+  const sessions: Session[] = [];
+  const days = [1, 3, 5]; // three sessions, never two days in a row
+  for (let wi = 0; wi < nWeeks; wi++) {
+    const startsOn = addDays(firstMonday, wi * 7);
+    const built = days.map((d, slot) => ({ date: addDays(startsOn, d), b: progressionSession(kind, wi, nWeeks, slot, zones) }));
+    const vol = built.reduce((k, x) => k + distanceOf(x.b.steps) / 1000, 0);
+    weeks.push({ index: wi, startsOn, phase: wi === nWeeks - 1 ? 'taper' : 'base', targetVolumeKm: Math.round(vol * 10) / 10 });
+    built.forEach(({ date, b }, slot) => {
+      if (date < startDate || date > goal.date) return;
+      sessions.push(finish(b, `${input.id}-w${wi}-${slot}`, wi, date));
+    });
+  }
+  return {
+    id: input.id,
+    goal,
+    startDate,
+    endDate: goal.date,
+    sessionsPerWeek: 3,
     vmaKmh,
     zones,
     revision: 1,

@@ -69,3 +69,11 @@ export function raceTime(s: number): string {
   const sec = Math.round(s % 60);
   return h > 0 ? `${h} h ${String(m).padStart(2, '0')}` : `${m}:${String(sec).padStart(2, '0')}`;
 }
+
+export const GOAL_LABEL: Record<string, string> = {
+  race: 'Ta course',
+  speed: 'Gagner en vitesse',
+  start_running: 'Commencer à courir',
+  injury_return: 'Reprise après blessure',
+  evaluation: 'Semaine d’évaluation',
+};
