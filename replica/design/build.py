@@ -134,8 +134,15 @@ def main():
         "tokens.dark.json": json.dumps({"_about": HEADER, "color": t["color_dark"],
                                         "pairs": t["pairs"]}, indent=2) + "\n",
     }
+    # the app imports the same generated file; never edit it there either
+    app_tokens = os.path.join(HERE, "..", "..", "apps", "mobile", "src", "theme", "tokens.ts")
+    targets = {name: os.path.join(HERE, name) for name in files}
+    if os.path.isdir(os.path.join(HERE, "..", "..", "apps", "mobile")):
+        os.makedirs(os.path.dirname(app_tokens), exist_ok=True)
+        targets["apps/mobile/src/theme/tokens.ts"] = app_tokens
+        files["apps/mobile/src/theme/tokens.ts"] = files["tokens.ts"]
     for name, content in files.items():
-        with open(os.path.join(HERE, name), "w", encoding="utf-8") as fh:
+        with open(targets[name], "w", encoding="utf-8") as fh:
             fh.write(content)
         print("wrote", name)
 

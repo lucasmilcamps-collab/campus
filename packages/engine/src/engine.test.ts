@@ -61,7 +61,17 @@ describe('level', () => {
     expect(z.marathon.min).toBeGreaterThan(z.half.min);
     expect(z.half.min).toBeGreaterThan(z['10k'].min);
     expect(z['10k'].min).toBeGreaterThan(z.vma.min);
+    expect(z.half.min).toBeGreaterThan(z.threshold.min);
+    // slow marathoners run marathon pace near the fast end of easy running; the easy zone's slow end is always slower
+    expect(z.ef.max).toBeGreaterThan(z.marathon.max);
     for (const r of Object.values(z)) expect(r.min).toBeLessThanOrEqual(r.max);
+  });
+  it('threshold sits between 10 km and half pace for a mid-level runner (52 min 10 km)', () => {
+    const z = estimateLevel({ age: 34, sex: 'female', experience: '1_3y', weeklyVolumeKm: 22, recent: { distanceM: 10_000, durationS: 52 * 60 + 30 } }).zones;
+    const mid = (r: { min: number; max: number }) => (r.min + r.max) / 2;
+    expect(mid(z.threshold)).toBeGreaterThanOrEqual(mid(z['10k']));
+    expect(mid(z.threshold)).toBeLessThan(mid(z.half));
+    expect(Math.abs(mid(z['10k']) - 315)).toBeLessThan(6); // 52:30 / 10 = 5:15 /km
   });
   it('formats paces', () => {
     expect(formatPace(238)).toBe('3:58');

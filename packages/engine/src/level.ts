@@ -92,27 +92,28 @@ export function predictTime(vmaKmh: number, distanceM: number): number {
   return Math.round(minutes * 60);
 }
 
-const ZONE_SHARES: Record<PaceZone, [number, number]> = {
-  // [fraction of VMA at the slow end, at the fast end]
-  ef: [0.65, 0.72],
-  marathon: [0.77, 0.79],
-  half: [0.82, 0.84],
-  '10k': [0.87, 0.89],
-  threshold: [0.85, 0.87],
-  vma: [0.98, 1.0],
-};
-
 export function paceFromKmh(kmh: number): number {
   return Math.round(3600 / kmh);
 }
 
+/** Race-pace zones come from the predicted race time at each distance; threshold
+ *  is what can be held for about an hour; easy running is 65-72% of VMA. Fixed
+ *  percentage bands for every zone break down across levels (a 52-minute 10 km
+ *  runner's 10 km pace *is* roughly threshold), so only ef and vma use them. */
 export function zonesFromVma(vmaKmh: number): PaceZones {
-  const out = {} as PaceZones;
-  for (const z of Object.keys(ZONE_SHARES) as PaceZone[]) {
-    const [slow, fast] = ZONE_SHARES[z];
-    out[z] = { min: paceFromKmh(vmaKmh * fast), max: paceFromKmh(vmaKmh * slow) };
-  }
-  return out;
+  const racePace = (m: number) => predictTime(vmaKmh, m) / (m / 1000);
+  const band = (centre: number, spread: number): ZoneRange => ({
+    min: Math.round(centre * (1 - spread)),
+    max: Math.round(centre * (1 + spread)),
+  });
+  return {
+    ef: { min: paceFromKmh(vmaKmh * 0.72), max: paceFromKmh(vmaKmh * 0.65) },
+    marathon: band(racePace(42_195), 0.01),
+    half: band(racePace(21_097), 0.01),
+    '10k': band(racePace(10_000), 0.01),
+    threshold: band(3600 / (vmaKmh * sustainableFraction(60)), 0.01),
+    vma: { min: paceFromKmh(vmaKmh), max: paceFromKmh(vmaKmh * 0.98) },
+  };
 }
 
 export function estimateLevel(i: LevelInput): Level {
