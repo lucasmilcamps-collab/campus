@@ -1,5 +1,5 @@
 feature,area,priority,original,clone,notes
-Sign up with email Apple or Google,onboarding,must,yes,partial,S01 | clone: S01 email only on the fake layer; no OTP code yet; Apple and Google need Supabase Auth (/replica-backend)
+Sign up with email Apple or Google,onboarding,must,yes,partial,S01 | clone: S01 email only on the fake layer; no OTP code yet; Apple and Google need Supabase Auth (/replica-backend) | backend: Supabase email code + Apple/Google (PKCE) built and wired (S01 code step); not yet run against a live project
 Onboarding questionnaire (about 10 questions: age experience weekly volume goal),onboarding,must,yes,yes,S02 | clone: S02: 7 steps (name age sex experience runs/week km/week recent time); goal is S05
 Estimate level and pace zones without a test,onboarding,must,yes,yes,S04; from age experience volume (changelog Jul 2026) | clone: S04; engine estimateLevel; race time optional
 Pace zone table (EF marathon half 10K threshold VMA),plan,must,yes,yes,S04 S10; derive from public training science not theirs | clone: S04 S10; race paces from predicted race times; 30 engine tests
@@ -11,13 +11,13 @@ Home week view with today's session and race countdown,plan,must,yes,yes,"S08 | 
 Plan overview by week,plan,must,yes,yes,"S09 | clone: S09: phases, volume bars, sessions per week"
 Structured session detail (warm-up blocks repeats cool-down target paces),sessions,must,yes,yes,S10 | clone: S10
 Purpose text explaining each session,sessions,must,yes,yes,S10; your own copy | clone: S10; our own copy in the engine
-Mark a session done or missed,sessions,must,yes,yes,S08 S10 | clone: S13 marks done; missed swept on read (job in /replica-backend)
+Mark a session done or missed,sessions,must,yes,yes,S08 S10 | clone: S13 marks done; missed swept on read (job in /replica-backend) | backend: hourly mark-missed cron per runner time zone; tested
 Post-session feedback with RPE (up to extreme) and a note,feedback,must,yes,yes,S13 | clone: S13 with pain flag
 Adapt paces and plan from feedback and missed sessions,plan,must,yes,yes,F05; bounded adjustment per update | clone: engine adapt(); capped 5%/2%; pain swaps next hard session; summary shown on S08 and S13
 Move a session to another day,plan,must,yes,yes,S16 | clone: S16 with back-to-back and double-booking warnings
-Connect Strava and import activities,integrations,must,yes,partial,"S25; open API; check the API terms | clone: S25 connect is simulated; OAuth, webhook and import in /replica-backend"
-Match imported activity to the planned session,integrations,must,yes,partial,S14 | clone: same-day matching works for manual activities; no provider imports yet
-Paywall with free tier and monthly/yearly subscription and free trial,payments,must,yes,partial,"S07; IAP on iOS and Android | clone: S07 UI, trial state, paid-goal gate; purchase simulated until RevenueCat (/replica-backend); prices are placeholders"
+Connect Strava and import activities,integrations,must,yes,yes,"S25; open API; check the API terms | clone: S25 connect is simulated; OAuth, webhook and import in /replica-backend | backend: OAuth (activity:read_all) + webhook + import job, tokens encrypted; tested against stubbed Strava; needs your Strava app and athlete capacity increase"
+Match imported activity to the planned session,integrations,must,yes,yes,"S14 | clone: same-day matching works for manual activities; no provider imports yet | backend: same local day, planned or missed, one activity per session; tested with a Strava import"
+Paywall with free tier and monthly/yearly subscription and free trial,payments,must,yes,partial,"S07; IAP on iOS and Android | clone: S07 UI, trial state, paid-goal gate; purchase simulated until RevenueCat (/replica-backend); prices are placeholders | backend: RevenueCat webhook (idempotent, re-reads subscriber) + server-side 402 gate done and tested; in-app purchase button needs the RevenueCat SDK in a dev build"
 Free programmes (evaluation week beginner injury return),payments,must,yes,partial,FAQ offers 2026 | clone: start running (8 wk) and injury return (6 wk) run/walk programmes are free; evaluation week not built
 Session summary planned vs actual,sessions,should,yes,no,S14; v5.6
 Export structured workout to Garmin with pace tolerance,integrations,should,yes,no,S11; needs Garmin partner approval; current week only
@@ -32,8 +32,8 @@ Training journal of notes,activities,should,yes,yes,S17; v5.10 | clone: S17
 Stats: weekly volume and pace trend,stats,should,yes,no,S18
 Race calendar search with filters (date place distance D+),races,should,yes,partial,"S19 | clone: S19 text (name or city), distance band and trail filters on demo races; no date range or D+ filter; no real race data source"
 Set a race from the calendar as the goal,races,should,yes,yes,S20 | clone: S20 -> S05 prefilled
-Session reminders (push),notifications,should,yes,no,S27
-Trial ending email 4 days before,notifications,should,yes,no,FAQ subscription
+Session reminders (push),notifications,should,yes,partial,S27 | backend: 15-min cron in each runner zone + Expo push sending; the app does not register push tokens yet (expo-notifications)
+Trial ending email 4 days before,notifications,should,yes,yes,FAQ subscription | backend: daily cron + Resend with our template; deduplicated; tested against stubbed Resend
 Difficulty level slider on the goal,goals,should,yes,no,S05 goals page
 Learn articles per session type,content,could,yes,no,S21; write your own
 Race nutrition guidance in long and hard sessions (Gut Training),sessions,could,yes,no,setting toggle; v4.7

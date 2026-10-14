@@ -298,3 +298,13 @@ Webhooks out: none in v1.
   - a readable "what changed" summary on every adaptation (`plan_adjustments.summary`);
   - fewer taps to put a session on the watch: an auto-export setting that pushes the
     whole current week, instead of one session at a time.
+
+## Changes made while building the backend
+
+See `replica/backend.md` → "Decisions that differ". In short:
+- workout steps are a jsonb column on `sessions`;
+- a Postgres job queue replaces Inngest;
+- cron routes are GET;
+- account deletion is SQL on `auth.users`;
+- RevenueCat stays the payment path (in-app purchase rules); Stripe is for a
+  later web checkout only.
