@@ -3,94 +3,31 @@
 // (Supabase + /api routes) will implement the same interface, so no screen
 // changes when it is swapped in.
 
-import type { Goal, GoalKind, ISODate, PaceZones, Plan, Preview, Session } from '@stride/engine';
+import type { Goal, ISODate, Plan, Preview, Session } from '@stride/engine';
 
-export interface User {
-  id: string;
-  email: string;
-  firstName?: string;
-  onboarded: boolean;
-}
-
-export interface OnboardingInput {
-  firstName?: string;
-  age: number;
-  sex: 'female' | 'male' | 'other' | 'undisclosed';
-  experience: 'none' | 'under_1y' | '1_3y' | 'over_3y';
-  weeklyVolumeKm: number;
-  runsPerWeekNow: number;
-  recent?: { distanceM: number; durationS: number };
-}
-
-export interface LevelInfo {
-  vmaKmh: number;
-  zones: PaceZones;
-  source: 'estimate' | 'race';
-  measuredOn: ISODate;
-}
-
-export interface Race {
-  id: string;
-  name: string;
-  date: ISODate;
-  city: string;
-  distanceM: number;
-  elevationGainM: number;
-  discipline: 'road' | 'trail';
-  membersCount: number;
-}
-
-export interface AdjustmentRow {
-  id: string;
-  createdAt: string;
-  summary: string;
-  paceChangePct: number;
-  reason: 'feedback' | 'missed_sessions' | 'settings_change' | 'move';
-  seen: boolean;
-}
-
-export interface Activity {
-  id: string;
-  sessionId?: string;
-  source: 'tracker' | 'manual' | 'strava' | 'garmin';
-  sport: 'run' | 'trail' | 'walk' | 'bike' | 'swim' | 'strength' | 'other';
-  date: ISODate;
-  durationS: number;
-  distanceM: number;
-  rpe?: number;
-  note?: string;
-}
-
-export interface Entitlement {
-  tier: 'free' | 'training';
-  status: 'none' | 'trial' | 'active' | 'cancelled';
-  trialUsed: boolean;
-  trialEndsAt?: ISODate;
-  period?: 'month' | 'year';
-}
-
-export interface Connection {
-  provider: 'strava' | 'garmin' | 'coros' | 'suunto';
-  status: 'active' | 'error';
-  lastSyncedAt?: string;
-}
-
-export interface Settings {
-  sessionsPerWeek: 3 | 4 | 5;
-  nutritionEnabled: boolean;
-  sessionReminder: boolean;
-}
+export type {
+  Activity,
+  AdjustmentRow,
+  Connection,
+  Entitlement,
+  LevelInfo,
+  OnboardingInput,
+  Race,
+  Settings,
+  User,
+} from '@stride/contract';
+export { FREE_GOALS } from '@stride/contract';
+import type { Activity, AdjustmentRow, Connection, Entitlement, ErrorCode, LevelInfo, OnboardingInput, Race, Settings, User } from '@stride/contract';
 
 export class ApiError extends Error {
   constructor(
-    public code: 'paywall' | 'not_found' | 'invalid' | 'too_short' | 'past_date' | 'conflict' | 'network',
+    public code: ErrorCode,
     message: string,
   ) {
     super(message);
   }
 }
 
-export const FREE_GOALS: GoalKind[] = ['evaluation', 'start_running', 'injury_return'];
 
 export interface Api {
   // auth (Supabase Auth later)

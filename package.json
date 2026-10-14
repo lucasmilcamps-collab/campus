@@ -5,6 +5,12 @@
   "scripts": {
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "tokens": "python3 replica/design/build.py"
+    "tokens": "python3 replica/design/build.py",
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:seed": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f supabase/seed.sql",
+    "test:server": "scripts/test-db.sh pnpm --filter @stride/server test"
+  },
+  "devDependencies": {
+    "pg": "^8.23.1"
   }
 }
