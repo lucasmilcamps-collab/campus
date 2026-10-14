@@ -136,6 +136,18 @@ export function createFakeApi(opts: FakeOptions = {}): Api & { reset(): Promise<
     return s.entitlement.tier === 'training' && (s.entitlement.status === 'trial' || s.entitlement.status === 'active');
   }
 
+  const signIn = (email: string) =>
+    run(
+      'signIn',
+      (s) => {
+        const clean = email.trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) throw new ApiError('invalid', 'Adresse e-mail invalide.');
+        if (!s.user || s.user.email !== clean) Object.assign(s, empty(), { user: { id: 'u_1', email: clean, onboarded: false } });
+        return s.user!;
+      },
+      true,
+    );
+
   const api: Api & { reset(): Promise<void>; seedDemo(): Promise<void> } = {
     async reset() {
       state = empty();
@@ -147,18 +159,11 @@ export function createFakeApi(opts: FakeOptions = {}): Api & { reset(): Promise<
       await save();
     },
 
+    capabilities: { oauth: false, emailCode: false, purchases: true, demo: true },
     me: () => run('me', (s) => s.user),
-    signIn: (email) =>
-      run(
-        'signIn',
-        (s) => {
-          const clean = email.trim().toLowerCase();
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) throw new ApiError('invalid', 'Adresse e-mail invalide.');
-          if (!s.user || s.user.email !== clean) Object.assign(s, empty(), { user: { id: 'u_1', email: clean, onboarded: false } });
-          return s.user!;
-        },
-        true,
-      ),
+    requestSignIn: async (email) => ({ codeSent: false, user: await signIn(email) }),
+    verifySignIn: () => Promise.reject(new ApiError('invalid', 'Pas de code à vérifier ici.')),
+    signInWithProvider: () => Promise.reject(new ApiError('invalid', 'Connexion Apple et Google indisponible en mode démo.')),
     signOut: () =>
       run(
         'signOut',
@@ -167,6 +172,7 @@ export function createFakeApi(opts: FakeOptions = {}): Api & { reset(): Promise<
         },
         true,
       ),
+
 
     onboarding: (input) =>
       run(
@@ -202,13 +208,13 @@ export function createFakeApi(opts: FakeOptions = {}): Api & { reset(): Promise<
         return r;
       }),
 
-    previewPlan: (goal) =>
+    previewPlan: ({ raceId: _r, elevationGainM: _e, ...goal }) =>
       run('previewPlan', (s) => {
         if (!s.level) throw new ApiError('invalid', 'Termine le questionnaire avant de créer un plan.');
         return previewPlan(goal, today(), s.level.vmaKmh, s.profile?.weeklyVolumeKm ?? 0);
       }),
 
-    createPlan: ({ goal, sessionsPerWeek }) =>
+    createPlan: ({ goal: { raceId: _r, elevationGainM: _e, ...goal }, sessionsPerWeek }) =>
       run(
         'createPlan',
         (s) => {

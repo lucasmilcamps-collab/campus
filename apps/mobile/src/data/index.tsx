@@ -2,17 +2,28 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import type { Api } from './api';
 import { ApiError } from './api';
 import { createFakeApi } from './fake';
+import { createHttpApi } from './http';
+import { supabase } from './supabase';
 import { devParams } from './clock';
 
 export * from './api';
 export { today } from './clock';
 
 type Ctx = { api: Api; version: number; invalidate: () => void };
+
+/** The real backend when the build is configured for it, else the on-device
+ *  fake (demos, screenshots, e2e). ?fake=1 forces the fake on web. */
+function pickApi(): Api {
+  const url = process.env.EXPO_PUBLIC_API_URL;
+  const sb = supabase();
+  if (url && sb && devParams().get('fake') !== '1') return createHttpApi(url.replace(/\/$/, ''), sb);
+  return createFakeApi();
+}
 const DataCtx = createContext<Ctx | null>(null);
 
 export function DataProvider({ children, api }: { children: ReactNode; api?: Api }) {
   const ref = useRef<Api | null>(null);
-  if (!ref.current) ref.current = api ?? createFakeApi();
+  if (!ref.current) ref.current = api ?? pickApi();
   const [version, setVersion] = useState(0);
   const [ready, setReady] = useState(false);
   useEffect(() => {

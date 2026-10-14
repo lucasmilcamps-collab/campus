@@ -162,12 +162,12 @@ export const routes: Route[] = [
   { method: 'GET', path: '/webhooks/strava', auth: 'webhook', run: async (_p: Params, r: Req) => strava.verifySubscription(r.query) },
   { method: 'POST', path: '/webhooks/strava', auth: 'webhook', run: (_p: Params, r: Req) => tx((c) => strava.handleWebhook(c, r.body)) },
 
-  // scheduled tasks (Vercel Cron or any scheduler, with CRON_SECRET)
-  { method: 'POST', path: '/cron/drain', auth: 'cron', run: () => drain() },
-  { method: 'POST', path: '/cron/mark-missed', auth: 'cron', run: async () => ({ users: await markMissed() }) },
-  { method: 'POST', path: '/cron/reminders', auth: 'cron', run: async () => ({ queued: await sessionReminders() }) },
-  { method: 'POST', path: '/cron/trial-ending', auth: 'cron', run: async () => ({ queued: await trialEnding() }) },
-  { method: 'POST', path: '/cron/cleanup', auth: 'cron', run: async () => (await cleanup(), { ok: true }) },
+  // scheduled tasks: Vercel Cron calls them with GET and "Authorization: Bearer CRON_SECRET"
+  { method: 'GET', path: '/cron/drain', auth: 'cron', run: () => drain() },
+  { method: 'GET', path: '/cron/mark-missed', auth: 'cron', run: async () => ({ users: await markMissed() }) },
+  { method: 'GET', path: '/cron/reminders', auth: 'cron', run: async () => ({ queued: await sessionReminders() }) },
+  { method: 'GET', path: '/cron/trial-ending', auth: 'cron', run: async () => ({ queued: await trialEnding() }) },
+  { method: 'GET', path: '/cron/cleanup', auth: 'cron', run: async () => (await cleanup(), { ok: true }) },
 ];
 
 onJob('strava.activity.import', async (c, p) => {

@@ -5,3 +5,5 @@ web-build/
 *.log
 .env*
 !.env.example
+.next/
+next-env.d.ts

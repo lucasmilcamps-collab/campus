@@ -8,7 +8,9 @@
     "tokens": "python3 replica/design/build.py",
     "db:migrate": "node scripts/migrate.mjs",
     "db:seed": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f supabase/seed.sql",
-    "test:server": "scripts/test-db.sh pnpm --filter @stride/server test"
+    "test:server": "scripts/test-db.sh pnpm --filter @stride/server test",
+    "test:contract": "scripts/test-db.sh scripts/seed-and.sh pnpm --filter @stride/mobile exec vitest run --config vitest.contract.config.ts",
+    "test:api-smoke": "scripts/test-db.sh scripts/seed-and.sh node apps/api/scripts/smoke.mjs"
   },
   "devDependencies": {
     "pg": "^8.23.1"

@@ -13,7 +13,7 @@ export default function Profile() {
   const plan = useQuery((api) => api.plan());
   const conns = useQuery((api) => api.connections());
   const update = useMutation((api, patch: Parameters<typeof api.updateSettings>[0]) => api.updateSettings(patch));
-  const signOut = useMutation((api) => api.signOut());
+  const signOut = useMutation((api, everywhere: boolean) => api.signOut(everywhere));
   const abandon = useMutation((api) => api.abandonPlan());
   const del = useMutation((api) => api.deleteAccount());
   const [confirm, setConfirm] = useState<'abandon' | 'delete' | null>(null);
@@ -105,7 +105,8 @@ export default function Profile() {
         <SectionTitle>Compte</SectionTitle>
         <ListGroup>
           {plan.data ? <ListRow title="Abandonner mon plan" destructive onPress={() => setConfirm('abandon')} /> : null}
-          <ListRow title="Se déconnecter" onPress={async () => (await signOut.run(), router.replace('/welcome'))} />
+          <ListRow title="Se déconnecter" onPress={async () => (await signOut.run(false), router.replace('/welcome'))} />
+          <ListRow title="Se déconnecter de tous les appareils" onPress={async () => (await signOut.run(true), router.replace('/welcome'))} />
           <ListRow title="Supprimer mon compte" destructive onPress={() => setConfirm('delete')} last />
         </ListGroup>
       </Stack>
@@ -114,7 +115,7 @@ export default function Profile() {
         <Banner kind="warning" title={confirm === 'abandon' ? 'Abandonner ton plan ?' : 'Supprimer ton compte ?'}>
           {confirm === 'abandon'
             ? 'Ton historique reste dans ton journal. Tu pourras choisir un nouvel objectif.'
-            : 'Toutes tes données (plan, séances, ressentis) seront effacées définitivement. Ton abonnement se gère depuis ton store.'}
+            : 'Toutes tes données (plan, séances, ressentis, connexions) seront effacées définitivement. Ton abonnement n’est pas annulé automatiquement : annule-le dans les réglages de ton App Store ou Google Play.'}
         </Banner>
       ) : null}
       {confirm ? (

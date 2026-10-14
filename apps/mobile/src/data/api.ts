@@ -19,6 +19,9 @@ export type {
 export { FREE_GOALS } from '@stride/contract';
 import type { Activity, AdjustmentRow, Connection, Entitlement, ErrorCode, LevelInfo, OnboardingInput, Race, Settings, User } from '@stride/contract';
 
+/** A goal as the app sends it: engine fields plus the directory race, if any. */
+export type GoalWithRace = Goal & { raceId?: string; elevationGainM?: number };
+
 export class ApiError extends Error {
   constructor(
     public code: ErrorCode,
@@ -30,10 +33,16 @@ export class ApiError extends Error {
 
 
 export interface Api {
-  // auth (Supabase Auth later)
+  /** what this backend can do, so screens only offer what works */
+  capabilities: { oauth: boolean; emailCode: boolean; purchases: boolean; demo: boolean };
+
+  // auth (Supabase Auth). Email: request a code, then verify it. A backend
+  // without codes (the fake) signs in on the request and returns the user.
   me(): Promise<User | null>;
-  signIn(email: string): Promise<User>;
-  signOut(): Promise<void>;
+  requestSignIn(email: string): Promise<{ codeSent: boolean; user?: User }>;
+  verifySignIn(email: string, code: string): Promise<User>;
+  signInWithProvider(provider: 'apple' | 'google'): Promise<User | null>;
+  signOut(everywhere?: boolean): Promise<void>;
 
   // F01 / F09
   onboarding(input: OnboardingInput): Promise<LevelInfo>;
@@ -42,8 +51,8 @@ export interface Api {
   // F02
   searchRaces(q: { text?: string; maxDistanceM?: number; discipline?: 'road' | 'trail' }): Promise<Race[]>;
   race(id: string): Promise<Race>;
-  previewPlan(goal: Goal): Promise<Preview>;
-  createPlan(input: { goal: Goal; sessionsPerWeek: 3 | 4 | 5 }): Promise<{ planId: string }>;
+  previewPlan(goal: GoalWithRace): Promise<Preview>;
+  createPlan(input: { goal: GoalWithRace; sessionsPerWeek: 3 | 4 | 5 }): Promise<{ planId: string }>;
   plan(): Promise<Plan | null>;
   abandonPlan(): Promise<void>;
 

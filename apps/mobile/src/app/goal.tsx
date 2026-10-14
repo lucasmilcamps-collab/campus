@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Gauge, HeartPulse, Mountain, Route, Search, Sprout } from 'lucide-react-native';
-import { addDays, type Goal, type GoalKind } from '@stride/engine';
-import { FREE_GOALS, today, useQuery } from '../data';
+import { addDays, type GoalKind } from '@stride/engine';
+import { FREE_GOALS, today, useQuery, type GoalWithRace } from '../data';
 import { dateLong, km } from '../copy';
 import { formatDateFR, parseDateFR, parseTime } from '../parse';
 import { Banner, Button, Card, ChoiceGroup, H1, Screen, SectionTitle, Segmented, Stack, T, TextField } from '../ui';
@@ -47,7 +47,7 @@ export default function GoalScreen() {
     }
   }, [race.data]);
 
-  const build = (): Goal | string => {
+  const build = (): GoalWithRace | string => {
     if (!kind) return 'Choisis un objectif.';
     if (kind === 'race' || kind === 'trail') {
       const iso = parseDateFR(date);
@@ -60,9 +60,9 @@ export default function GoalScreen() {
         const e = Number(trailDplus);
         if (!(d >= 5 && d <= 200)) return 'Distance du trail : entre 5 et 200 km.';
         if (!(e >= 0 && e <= 12000)) return 'Dénivelé : entre 0 et 12 000 m.';
-        return { kind: 'race', surface: 'trail', distanceM: Math.round(d * 1000), date: iso, targetTimeS: t, name: race.data?.name };
+        return { kind: 'race', surface: 'trail', distanceM: Math.round(d * 1000), elevationGainM: Math.round(e), date: iso, targetTimeS: t, name: race.data?.name, raceId: race.data?.id };
       }
-      return { kind: 'race', surface: 'road', distanceM: DIST_M[dist], date: iso, targetTimeS: t, name: race.data?.name };
+      return { kind: 'race', surface: 'road', distanceM: DIST_M[dist], date: iso, targetTimeS: t, name: race.data?.name, raceId: race.data?.id };
     }
     const p = PRESET[kind];
     return { kind: p.kind, distanceM: p.distanceM, date: addDays(today(), p.weeks * 7 - 1) };

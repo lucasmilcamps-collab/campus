@@ -1,0 +1,9 @@
+{
+  "crons": [
+    { "path": "/api/cron/drain", "schedule": "* * * * *" },
+    { "path": "/api/cron/mark-missed", "schedule": "7 * * * *" },
+    { "path": "/api/cron/reminders", "schedule": "*/15 * * * *" },
+    { "path": "/api/cron/trial-ending", "schedule": "13 7 * * *" },
+    { "path": "/api/cron/cleanup", "schedule": "23 3 * * *" }
+  ]
+}

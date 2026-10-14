@@ -316,9 +316,9 @@ describe('Strava', () => {
 
 describe('jobs, cron, email', () => {
   it('cron routes need the secret', async () => {
-    expect((await call('POST', '/cron/drain')).status).toBe(401);
-    expect((await call('POST', '/cron/drain', { headers: { authorization: 'Bearer nope' } })).status).toBe(401);
-    expect(ok(await call('POST', '/cron/drain', { headers: { authorization: `Bearer ${SECRETS.CRON_SECRET}` } }))).toMatchObject({ dead: 0 });
+    expect((await call('GET', '/cron/drain')).status).toBe(401);
+    expect((await call('GET', '/cron/drain', { headers: { authorization: 'Bearer nope' } })).status).toBe(401);
+    expect(ok(await call('GET', '/cron/drain', { headers: { authorization: `Bearer ${SECRETS.CRON_SECRET}` } }))).toMatchObject({ dead: 0 });
   });
 
   it('a failing job retries with backoff, then lands in the dead-letter state', async () => {
@@ -334,8 +334,8 @@ describe('jobs, cron, email', () => {
     await db().query("update public.subscriptions set status = 'trial', trial_ends_at = now() + interval '4 days' where user_id = $1", [A.id]);
     fakes = [(url) => (url === 'https://api.resend.com/emails' ? { body: { id: 'em_1' } } : undefined)];
     const cron = { authorization: `Bearer ${SECRETS.CRON_SECRET}` };
-    expect(ok(await call('POST', '/cron/trial-ending', { headers: cron })).queued).toBe(1);
-    ok(await call('POST', '/cron/trial-ending', { headers: cron }));
+    expect(ok(await call('GET', '/cron/trial-ending', { headers: cron })).queued).toBe(1);
+    ok(await call('GET', '/cron/trial-ending', { headers: cron }));
     await drain();
     const sent = outbound.filter((o) => o.url === 'https://api.resend.com/emails');
     expect(sent).toHaveLength(1);
